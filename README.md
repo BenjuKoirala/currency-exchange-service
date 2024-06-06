@@ -46,9 +46,9 @@ go test
 
 ## Using the CLI client
 ```
-./target/exchange-cli getrate -base USD -target NPR
+./target/exchange-cli getrate -b USD -t NPR
 ```
-* `-base` specifies the base currency (e.g., USD).
-* `-target` specifies the target currency (e.g., NPR).
+* `-b` specifies the base currency (e.g., USD).
+* `-t` specifies the target currency (e.g., NPR).
 
 

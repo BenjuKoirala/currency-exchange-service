@@ -17,7 +17,7 @@ var baseCurrency, targetCurrency string
 var getRateCmd = &cobra.Command{
 	Use:   "getrate",
 	Short: "Get exchange rate for a currency pair",
-	Long:  `Usage : $exchange-rate <src-currency> <trg-currency>`,
+	Long:  `Usage : $exchange-cli getrate -b <src-currency> -t <trg-currency>`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Dial the gRPC server
 		conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure(), grpc.WithBlock())
