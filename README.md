@@ -17,7 +17,7 @@ CurrencyExchangeService is a gRPC service that provides exchange rates between d
 git clone https://github.com/BenjuKoirala/currency-exchange-service.git
 ```
 ```
-cd CurrencyExchangeService
+cd currency-exchange-service
 ```
 
 ## (Optional) Generate gRPC and Protocol Buffers code:
