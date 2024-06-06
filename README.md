@@ -15,6 +15,8 @@ CurrencyExchangeService is a gRPC service that provides exchange rates between d
 ## Clone repository
 ```
 git clone https://github.com/BenjuKoirala/currency-exchange-service.git
+```
+```
 cd CurrencyExchangeService
 ```
 
@@ -33,18 +35,18 @@ go build -o target/exchange-cli ./exchange-cli
 To start the gRPC server:
 * Update config.json with API key from ExchangeRate-API (https://app.exchangerate-api.com/keys)
 ```
-$ go run server/server.go
+go run server/server.go
 ```
 
 ## Running tests
 ```
-$ cd ./server
-$ go test
+cd ./server
+go test
 ```
 
 ## Using the CLI client
 ```
-$ ./target/exchange-cli getrate -base USD -target NPR
+./target/exchange-cli getrate -base USD -target NPR
 ```
 * `-base` specifies the base currency (e.g., USD).
 * `-target` specifies the target currency (e.g., NPR).
