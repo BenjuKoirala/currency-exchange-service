@@ -41,6 +41,8 @@ go run server/server.go
 ## Running tests
 ```
 cd ./server
+```
+```
 go test
 ```
 
