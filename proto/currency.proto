@@ -1,0 +1,25 @@
+syntax = "proto3";  // file uses Protocol Buffers version 3 (proto3 - latest and simpler syntax)
+
+package currency; // just a namespace for the protobuf messages and the gRPC service; helps eliminate naming conflicts between different protobuf files
+
+// Add the go_package option
+option go_package = "proto/currency";
+
+
+service CurrencyService { // service keyword defines a gRPC service called CurrencyService
+  rpc GetExchangeRate (ExchangeRateRequest) returns (ExchangeRateResponse); //GetExchangeRate is a RPC call method
+} // basically it is declaring a API endpoint and the request-response structure for the gRPC service
+
+message ExchangeRateRequest { // message keyword is defining a data structure for the request name ExchangeRateRequest
+  string base_currency = 1; // base_currency and target_currency are fields within this message and string is their type
+  string target_currency = 2;
+} // 1 and 2 are field numbers which are unique and used to identify the fields in the binary encoded message, allowing the protobuf system to efficiently serialize and deserialize the data
+
+message ExchangeRateResponse { // message defines a data structure for the response message named `ExchangeRateResponse` and rate is a field of type double
+  double rate = 1;  // 1 is the field number
+}
+
+// .proto file specifies a gRPC service and the messages it uses
+// defines how the service communicates using rpc methods and the structure of the data being exchanged
+// using message definitions
+// message contains fields with specific types and unique field numbers for serialization purposes
