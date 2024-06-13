@@ -11,6 +11,8 @@ import (
 	"google.golang.org/grpc"
 	"net"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -47,6 +49,18 @@ func main() {
 	}
 	s := grpc.NewServer()
 	currency.RegisterCurrencyServiceServer(s, &server{})
+
+	// Handle graceful shutdown of the server
+	go func() {
+		sig := make(chan os.Signal, 1)
+		signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
+		<-sig // blocks goroutine until it receives a signal on the sig channel and once it receives signal the execution continues
+		log.Info("Received shutdown signal and gracefully stopping server.....")
+		s.GracefulStop()
+		log.Info("Server stopped")
+		os.Exit(0)
+	}()
+
 	log.Infof("server is running at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("error starting server : %v", err)
@@ -59,15 +73,17 @@ type server struct {
 	currency.UnimplementedCurrencyServiceServer
 }
 
+// GetExchangeRate method is the gRPC endpoint which calls getExchangeRate() to fetch exchange rate
 func (s *server) GetExchangeRate(ctx context.Context, req *currency.ExchangeRateRequest) (*currency.ExchangeRateResponse, error) {
 	return s.getExchangeRate(ctx, req, apiURL, apiKey)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
+// getExchangeRate actual functionality of the Currency Service and the GetExchangeRate method
 func (s *server) getExchangeRate(ctx context.Context, req *currency.ExchangeRateRequest, apiURL, apiKey string) (*currency.ExchangeRateResponse, error) {
 	log.Info("Incoming request to the exchange server")
-	client := resty.New()
+	client := resty.New() // creates a new instance of the client using resty HTTP client library
 	url := apiURL + apiKey + "/pair/" + req.BaseCurrency + "/" + req.TargetCurrency
 	log.Infof("Sending request to url %s", url)
 
