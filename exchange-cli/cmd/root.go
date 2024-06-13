@@ -9,12 +9,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-var GrpcServerEndpoint string
-
 var rootCmd = &cobra.Command{
 	Use:   "exchange-cli",
 	Short: "A CLI for currency exchange rates",
 }
+
+var GrpcServerEndpoint string
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 func Execute() {
@@ -25,11 +25,11 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(loadConfig)
 }
 
-// initConfig reads in config file and ENV variables if set.
-func initConfig() {
+// loadConfig reads in config file
+func loadConfig() {
 	// Use config file from the flag.
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
