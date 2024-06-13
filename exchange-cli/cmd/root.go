@@ -1,14 +1,15 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+var GrpcServerEndpoint string
 
 var rootCmd = &cobra.Command{
 	Use:   "exchange-cli",
@@ -18,7 +19,7 @@ var rootCmd = &cobra.Command{
 // Execute adds all child commands to the root command and sets flags appropriately.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		log.Printf("Error while executing root command %v", err.Error())
 		os.Exit(1)
 	}
 }
@@ -29,23 +30,18 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
-
-		// Search config in home directory with name ".exchange-cli" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".exchange-cli")
+	// Use config file from the flag.
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	configPath := filepath.Join(".", "exchange-cli")
+	viper.AddConfigPath(configPath)
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatalf("Error reading config file : %v", err.Error())
 	}
-
-	viper.AutomaticEnv() // read in environment variables that match
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	// Retrieve the gRPC server endpoint from config file
+	GrpcServerEndpoint = viper.GetString("grpc.server_endpoint")
+	if GrpcServerEndpoint == "" {
+		log.Fatal("gRPC server endpoint not specified in config file")
 	}
 }

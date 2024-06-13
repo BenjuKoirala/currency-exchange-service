@@ -11,7 +11,9 @@ import (
 	"google.golang.org/grpc"
 )
 
-var baseCurrency, targetCurrency string
+var (
+	baseCurrency, targetCurrency string
+)
 
 // getRateCmd represents the getrate command
 var getRateCmd = &cobra.Command{
@@ -19,15 +21,17 @@ var getRateCmd = &cobra.Command{
 	Short: "Get exchange rate for a currency pair",
 	Long:  `Usage : $exchange-cli getrate -b <src-currency> -t <trg-currency>`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// Dial the gRPC server
-		conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure(), grpc.WithBlock())
+		log.Println("Starting getrate command")
+
+		log.Printf("Dialing gRPC server at %s", GrpcServerEndpoint)
+		conn, err := grpc.Dial(GrpcServerEndpoint, grpc.WithInsecure(), grpc.WithBlock())
 		if err != nil {
-			log.Fatalf("did not connect: %v", err)
+			log.Fatalf("Did not connect: %v", err)
 		}
 		defer conn.Close()
-		client := currency.NewCurrencyServiceClient(conn)
+		client := currency.NewCurrencyServiceClient(conn) // creates a new client for the CurrencyService
 
-		// Set up context with timeout
+		// Setting up context with timeout
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
 
@@ -37,8 +41,9 @@ var getRateCmd = &cobra.Command{
 			TargetCurrency: targetCurrency,
 		})
 		if err != nil {
-			log.Printf(err.Error())
+			log.Printf("Error while getting exchage rate: %v", err.Error())
 		} else {
+			log.Printf("Received exchange rate: %f", res.GetRate())
 			fmt.Printf("Exchange rate from %s to %s : %f\n", baseCurrency, targetCurrency, res.GetRate())
 		}
 	},
@@ -47,7 +52,12 @@ var getRateCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(getRateCmd)
 
-	// Define flags and configuration settings
-	getRateCmd.Flags().StringVarP(&baseCurrency, "base", "b", "USD", "Base currency")
-	getRateCmd.Flags().StringVarP(&targetCurrency, "target", "t", "EUR", "Target currency")
+	// Defining flags
+	getRateCmd.Flags().StringVarP(&baseCurrency, "base", "b", "", "Base currency")
+	getRateCmd.Flags().StringVarP(&targetCurrency, "target", "t", "", "Target currency")
+
+	//Making flags required
+	getRateCmd.MarkFlagsRequiredTogether("base", "target")
+
+	log.Println("Initialized getrate command")
 }
